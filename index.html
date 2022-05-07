@@ -1,40 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-      window.OneSignal = window.OneSignal || [];
-      OneSignal.push(function() {
-	OneSignal.init({
-	  appId: "12c65237-d731-4618-b936-a4ae1a73f823",
-	  safari_web_id: "",
-	  notifyButton: {
-	    enable: true,
-	  },
-	});
-      });
-    </script>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" href="images/icons/icon.jpg" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="styles.css" />
-    <title>InstaWeb PWA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- ios support -->
+    <link rel="apple-touch-icon" href="images/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-384x384.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-512x512.png">
+    <meta name="apple-mobile-web-app-status-bar" content="#db4938">
+    <meta name="theme-color" content="#db4938">
+    <title>Profes DCC</title>
   </head>
   <body>
     <main>
       <nav>
-        <h1>InstaWeb PWA</h1>
+        <h1>Profes DCC</h1>
         <ul>
-          <li>Home</li>
-          <li>About</li>
-          <li>Blog</li>
+          <li>Profesores</li>
+          <li>Mis Solicitudes</li>
         </ul>
       </nav>
-      <div class="container"></div>
+      <div id="all-teachers", class="container">
+        <div class="card">
+          <img class="card--avatar" src="images/Arenas.webp" />
+          <h1 class="card--title">Marcelo Arenas</h1>
+          <button id="Arenas" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Baier.webp"/>
+          <h1 class="card--title">Jorge Baier</h1>
+          <button id="Baier" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Eterovic.webp"/>
+          <h1 class="card--title">Yadran Eterovic</h1>
+          <button id="Eterovic" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Herskovic.webp"/>
+          <h1 class="card--title">Valeria Herskovic</h1>
+          <button id="Herskovic" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Lobel.webp" />
+          <h1 class="card--title">Hans Löbel​</h1>
+          <button id="Lobel" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Mery.webp" />
+          <h1 class="card--title">Domingo Mery</h1>
+          <button id="Mery" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Muñoz.webp"/>
+          <h1 class="card--title">Jorge Muñoz</h1>
+          <button id="Munoz" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Navon.webp" />
+          <h1 class="card--title">Jaime Navón</h1>
+          <button id="Navon" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Neyem.webp" />
+          <h1 class="card--title">Andrés Neyem</h1>
+          <button id="Neyem" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Nussbaum.webp" />
+          <h1 class="card--title">Miguel Nussbaum</h1>
+          <button id="Nussbaum" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Parra.webp" />
+          <h1 class="card--title">Denis Parra</h1>
+          <button id="Parra" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Pichara.webp" />
+          <h1 class="card--title">Karim Pichara</h1>
+          <button id="Pichara" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Reuter.webp" />
+          <h1 class="card--title">Juan Reutter</h1>
+          <button id="Reutter" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Riveros.webp" />
+          <h1 class="card--title">Cristián Riveros</h1>
+          <button id="Riveros" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Ruz.webp" />
+          <h1 class="card--title">Cristian Ruz</h1>
+          <button id="Ruz" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Sepúlveda.webp" />
+          <h1 class="card--title">Marcos Sepúlveda</h1>
+          <button id="Sepulveda" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Sandoval.webp" />
+          <h1 class="card--title">Juan Pablo Sandoval</h1>
+          <button id="Sandoval" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Soto.webp" />
+          <h1 class="card--title">Álvaro Soto</h1>
+          <button id="Soto" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+        <div class="card">
+          <img class="card--avatar" src="images/Valdés.webp" />
+          <h1 class="card--title">Gonzalo Valdés</h1>
+          <button id="Valdes" class="card--btn send" onclick={handleClick(this)}>Enviar Solicitud</button>
+        </div>
+      </div>
+      <!-- <div id="my-requests", class="container"></div> -->
     </main>
-    <script src="main.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
-
