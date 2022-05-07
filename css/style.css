@@ -86,3 +86,26 @@ h1 {
 .cancel {
   background:gray;
 }
+
+/* .tab { 
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+} */
+.tab li {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.tab li:hover {
+  background-color: #ddd;
+}
+
+.tab li.active {
+  font-weight: bold;
+}
