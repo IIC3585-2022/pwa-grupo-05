@@ -1,4 +1,3 @@
-const teachersContainer = document.querySelector("#all-teachers");
 const teachers = [
   {
     name: "Marcelo Arenas",
@@ -97,14 +96,30 @@ const teachers = [
   }
 ];
 
+
 const removeAllChildNodes = parent => {
   while (parent.firstChild) {
       parent.removeChild(parent.firstChild);
   }
 }
 
+const loadMyRequestCards = tabName => {
+  var  requestContainer, teacherCard;
+  requestContainer = document.getElementById(tabName)
+  removeAllChildNodes(requestContainer)
+  teachers.forEach(teacher => {
+    teacherCard = document.getElementById(teacher.card_id).cloneNode(true);
+    teacherCard.removeAttribute('id');
+    teacherCard.id = teacher.card_id + '-request'
+    teacherButton = document.getElementById(teacher.card_id.split('-')[0])
+    if (teacherButton.classList.contains('cancel')) {
+      requestContainer.appendChild(teacherCard)
+    }
+  });
+}
+
 const openTab = (e, tabName) => { // hide elements with class tabcontent
-  var i, tabcontent, tablinks, requestContainer, teacherCard;
+  var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
@@ -114,25 +129,25 @@ const openTab = (e, tabName) => { // hide elements with class tabcontent
     tablinks[i].className = tablinks[i].className.replace("active", "");
   }
   if (tabName == "my-requests") {
-    requestContainer = document.getElementById(tabName)
-    removeAllChildNodes(requestContainer)
-    teachers.forEach(teacher => {
-      teacherCard = document.getElementById(teacher.card_id).cloneNode(true);
-      teacherCard.removeAttribute('id');
-      teacherCard.id = teacher.card_id + '-request'
-      console.log("teacher card: ", teacherCard)
-      teacherButton = document.getElementById(teacher.card_id.split('-')[0])
-      if (teacherButton.classList.contains('cancel')) {
-        requestContainer.appendChild(teacherCard)
-      }
-    })
+    loadMyRequestCards(tabName);
   }
   document.getElementById(tabName).style.display = "grid"; // activate selected tab
   e.currentTarget.classList.add("active");
 }
 
-const handleClick = (e) => {
-  console.log("E: ", e)
+const editButtonClass = (e, button) => {
+  let class_;// Modificamos su clase
+  if ( e.classList.contains('send')) { 
+    class_ = 'cancel';
+    button.classList.remove('send');
+  } else {
+    class_ = 'send';
+    button.classList.remove('cancel');
+  }
+  button.classList.add(class_);
+}
+
+const handleClick = e => {
   let data_ = e.firstChild.data == "Cancelar" ? "Enviar Solicitud" : "Cancelar"
   button = document.getElementById(e.id); // Tomamos el botón a modificar
   button.firstChild.data = data_; // Modificamos su texto
@@ -140,24 +155,10 @@ const handleClick = (e) => {
     // Se canceló la solicitud,
     // Elimino tarjeta de Mis Solicitudes
     var myRequests = document.getElementById("my-requests")
-    var cardId = "#"+ e.id + "-card-request"
-    console.log(cardId)
-    var canceledTeacher = myRequests.querySelector(cardId)
+    var canceledTeacher = myRequests.querySelector("#"+ e.id + "-card-request")
     myRequests.removeChild(canceledTeacher);
-
-
   }
-
-  let class_;// Modificamos su clase
-  if ( e.classList.contains('send')) { 
-    class_ = 'cancel';
-    button.classList.remove('send');
-
-  } else {
-    class_ = 'send';
-    button.classList.remove('cancel');
-  }
-  button.classList.add(class_);
+  editButtonClass(e, button)
 }
 
 if ("serviceWorker" in navigator) {

@@ -87,11 +87,6 @@ h1 {
   background:gray;
 }
 
-/* .tab { 
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-} */
 .tab li {
   background-color: inherit;
   float: left;
