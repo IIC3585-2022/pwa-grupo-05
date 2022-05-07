@@ -181,46 +181,37 @@ function updateSubscriptionOnServer(subscription) {
     
     subscriptionJson.textContent = JSON.stringify(subscription);
     subscriptionDetails.classList.remove('is-invisible');
-// aca hago mi fetch
+    // aca hago mi fetch
     // console.log("if subs", subscriptionJson.textContent)
     // console.log("if subs", JSON.parse(subscriptionJson.textContent)["keys"]["auth"])
 
+    console.log(JSON.stringify(subscription));
 
+    const subDetails = JSON.parse(JSON.stringify(subscription));
+    console.log(subDetails);
     
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json","Retry-After");
-    
-    var raw = JSON.stringify({
-      "subscription": {
-        "endpoint": "https://fcm.googleapis.com/fcm/send/facyAJIlBeU:APA91bFbUSawfQVb7OQLuYulw8yZ2fJb4eFEYYc8yd1vHiGjGPaQtvhq40L_4czJPfrdfIiC5Lv7SDY1ivtRxtx4ZLiY7mWaZ9xa8mCekYEoJpm3DjQCSmnCcOwBJo3345eRdjk-vUus",
-        "expirationTime": null,
-        "keys": {
-          "p256dh": "BMPOgr5zJf1OE0PL3gFXwlT0Pu80psRH4BMuergy7rK98a2_c9QlInfuJrldLbfNns23tLlhwdPmgAWynk7Je6E",
-          "auth": "YqABxSjSFhKcPflxCUfTAQ"
-        }
-      },
-      "data": "wtf",
-      "applicationKeys": {
-        "public": "BPhU8x4kP2_GhrEIlKOb42MeDCV0BN59CUTdknTnINcsG6lqjTcQPiy3TCr8QNsyQo-SiIGvJQxRyHQictDS0J8",
-        "private": "dYwtzBQtrHqfkOLU2Tvebzw1bmdzJw0GLl2HBsT6PjQ"
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const body = JSON.stringify({
+      "msg": "Se ha enviado la solicitud al profesor.",
+      "endpoint": subDetails.endpoint,
+      "keys": {
+        "auth": subDetails.keys.auth,
+        "p256dh": subDetails.keys.p256dh,
       }
     });
-    
-    var requestOptions = {
+    const requestOptions = {
       method: 'POST',
-      mode: 'no-cors',
       headers: myHeaders,
-      body: raw,
+      body,
       redirect: 'follow'
     };
     
-    fetch("https://web-push-codelab.glitch.me/api/send-push-msg/", requestOptions)
+    fetch("https://pwag5-api.herokuapp.com/subscribe", requestOptions)
       .then(response => response.text())
       .then(result => console.log(result))
       .catch(error => console.log('error', error));
-
-
-
 
   } else {
     subscriptionDetails.classList.add('is-invisible');
