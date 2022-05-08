@@ -100,7 +100,7 @@ const teachers = [
 ];
 
 
-let pushButton;
+let pushButton = {"disabled": false};
 
 let isSubscribed = false;
 let swRegistration = null;
@@ -119,10 +119,6 @@ function urlB64ToUint8Array(base64String) {
   }
   return outputArray;
 }
-
-
-
-
 
 const removeAllChildNodes = parent => {
   while (parent.firstChild) {
@@ -177,6 +173,8 @@ const editButtonClass = (e, button) => {
 
 function initialiseUI() {
 
+  console.log("Initialize UI");
+
   pushButton.disabled = true;
   if (isSubscribed) {
     unsubscribeUser();
@@ -188,7 +186,7 @@ function initialiseUI() {
 swRegistration.pushManager.getSubscription()
 .then(function(subscription) {
   isSubscribed = !(subscription === null);
-  updateSubscriptionOnServer(subscription);
+  // updateSubscriptionOnServer(subscription);
 
   if (isSubscribed) {
     console.log('User IS subscribed.');
@@ -252,7 +250,7 @@ navigator.serviceWorker.register('serviceWorker.js')
   console.log('Service Worker is registered', swReg);
 
   swRegistration = swReg;
-  initialiseUI();
+  // initialiseUI();
 })
 
 
@@ -279,30 +277,7 @@ function subscribeUser() {
 
 
 const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
-swRegistration.pushManager.subscribe({
-  userVisibleOnly: true,
-  applicationServerKey: applicationServerKey
-})
 
-
-swRegistration.pushManager.subscribe({
-  userVisibleOnly: true,
-  applicationServerKey: applicationServerKey
-})
-.then(function(subscription) {
-  console.log('User is subscribed:', subscription);
-
-  updateSubscriptionOnServer(subscription);
-
-  isSubscribed = true;
-
-  updateBtn();
-
-})
-.catch(function(err) {
-  console.log('Failed to subscribe the user: ', err);
-  updateBtn();
-});
 
 
 function updateSubscriptionOnServer(subscription) {
