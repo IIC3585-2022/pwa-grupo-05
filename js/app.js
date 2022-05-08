@@ -171,16 +171,18 @@ const editButtonClass = (e, button) => {
 }
 
 
-function initialiseUI() {
+function initialiseUI(teacherId, action) {
 
   console.log("Initialize UI");
 
-  pushButton.disabled = true;
-  if (isSubscribed) {
-    unsubscribeUser();
-  } else {
-    subscribeUser();
-  }  
+  // pushButton.disabled = true;
+  // if (isSubscribed) {
+  //   unsubscribeUser();
+  // } else {
+  //   subscribeUser(teacherId);
+  // }
+    subscribeUser(teacherId, action);
+
 
 // Set the initial subscription value
 swRegistration.pushManager.getSubscription()
@@ -205,14 +207,16 @@ const handleClick = e => {
   let data_ = e.firstChild.data == "Cancelar" ? "Enviar Solicitud" : "Cancelar"
   let button = document.getElementById(e.id); // Tomamos el botón a modificar
   pushButton = button;
-  initialiseUI()
+  initialiseUI(e.id, e.firstChild.data)
   button.firstChild.data = data_; // Modificamos su texto
   if (data_ == "Enviar Solicitud") { 
     // Se canceló la solicitud,
     // Elimino tarjeta de Mis Solicitudes
     var myRequests = document.getElementById("my-requests")
     var canceledTeacher = myRequests.querySelector("#"+ e.id + "-card-request")
-    myRequests.removeChild(canceledTeacher);
+    try {
+      myRequests.removeChild(canceledTeacher);
+    } catch(err) {}
   }
   editButtonClass(e, button)
 }
@@ -237,7 +241,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 function updateBtn() {
   if (Notification.permission === 'denied') {
     pushButton.disabled = true;
-    updateSubscriptionOnServer(null);
+    updateSubscriptionOnServer(null, null, null);
     return;
   }
 
@@ -248,13 +252,11 @@ function updateBtn() {
 navigator.serviceWorker.register('serviceWorker.js')
 .then(function(swReg) {
   console.log('Service Worker is registered', swReg);
-
   swRegistration = swReg;
-  // initialiseUI();
 })
 
 
-function subscribeUser() {
+function subscribeUser(teacherId, action) {
   const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
@@ -263,7 +265,7 @@ function subscribeUser() {
   .then(function(subscription) {
     console.log('User is subscribed:', subscription);
 
-    updateSubscriptionOnServer(subscription);
+    updateSubscriptionOnServer(subscription, teacherId, action);
 
     isSubscribed = true;
 
@@ -280,18 +282,14 @@ const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
 
 
 
-function updateSubscriptionOnServer(subscription) {
+function updateSubscriptionOnServer(subscription, teacherId, action) {
   // TODO: Send subscription to application server
 
+  let msge = action == "Enviar Solicitud" 
+    ? "Se ha enviado su solicitud al profesor "
+    : "Ha cancelado su solicitud al profesor "
 
   if (subscription) {
-
-    
-
-
-    // aca hago mi fetch
-    // console.log("if subs", subscriptionJson.textContent)
-    // console.log("if subs", JSON.parse(subscriptionJson.textContent)["keys"]["auth"])
 
     console.log(JSON.stringify(subscription));
 
@@ -302,7 +300,7 @@ function updateSubscriptionOnServer(subscription) {
     myHeaders.append("Content-Type", "application/json");
 
     const body = JSON.stringify({
-      "msg": "Se ha enviado la solicitud al profesor.",
+      "msg": msge + teacherId,
       "endpoint": subDetails.endpoint,
       "keys": {
         "auth": subDetails.keys.auth,
@@ -335,7 +333,7 @@ function unsubscribeUser() {
     console.log('Error unsubscribing', error);
   })
   .then(function() {
-    updateSubscriptionOnServer(null);
+    updateSubscriptionOnServer(null, null, null);
 
     console.log('User is unsubscribed.');
     isSubscribed = false;
