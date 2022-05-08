@@ -1,3 +1,6 @@
+'use strict';
+const applicationServerPublicKey = 'BPhU8x4kP2_GhrEIlKOb42MeDCV0BN59CUTdknTnINcsG6lqjTcQPiy3TCr8QNsyQo-SiIGvJQxRyHQictDS0J8';
+
 const teachers = [
   {
     name: "Marcelo Arenas",
@@ -97,6 +100,30 @@ const teachers = [
 ];
 
 
+let pushButton;
+
+let isSubscribed = false;
+let swRegistration = null;
+
+function urlB64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+
+
+
+
 const removeAllChildNodes = parent => {
   while (parent.firstChild) {
       parent.removeChild(parent.firstChild);
@@ -108,10 +135,10 @@ const loadMyRequestCards = tabName => {
   requestContainer = document.getElementById(tabName)
   removeAllChildNodes(requestContainer)
   teachers.forEach(teacher => {
-    teacherCard = document.getElementById(teacher.card_id).cloneNode(true);
+    let teacherCard = document.getElementById(teacher.card_id).cloneNode(true);
     teacherCard.removeAttribute('id');
     teacherCard.id = teacher.card_id + '-request'
-    teacherButton = document.getElementById(teacher.card_id.split('-')[0])
+    let teacherButton = document.getElementById(teacher.card_id.split('-')[0])
     if (teacherButton.classList.contains('cancel')) {
       requestContainer.appendChild(teacherCard)
     }
@@ -147,9 +174,40 @@ const editButtonClass = (e, button) => {
   button.classList.add(class_);
 }
 
+
+function initialiseUI() {
+
+  pushButton.disabled = true;
+  if (isSubscribed) {
+    unsubscribeUser();
+  } else {
+    subscribeUser();
+  }  
+
+// Set the initial subscription value
+swRegistration.pushManager.getSubscription()
+.then(function(subscription) {
+  isSubscribed = !(subscription === null);
+  updateSubscriptionOnServer(subscription);
+
+  if (isSubscribed) {
+    console.log('User IS subscribed.');
+  } else {
+    console.log('User is NOT subscribed.');
+  }
+
+  updateBtn();
+});
+
+};
+
+
 const handleClick = e => {
+  
   let data_ = e.firstChild.data == "Cancelar" ? "Enviar Solicitud" : "Cancelar"
-  button = document.getElementById(e.id); // Tomamos el botón a modificar
+  let button = document.getElementById(e.id); // Tomamos el botón a modificar
+  pushButton = button;
+  initialiseUI()
   button.firstChild.data = data_; // Modificamos su texto
   if (data_ == "Enviar Solicitud") { 
     // Se canceló la solicitud,
@@ -161,11 +219,153 @@ const handleClick = e => {
   editButtonClass(e, button)
 }
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker
-      .register("/serviceWorker.js")
-      .then(res => console.log("service worker registered"))
-      .catch(err => console.log("service worker not registered", err));
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  console.log('Service Worker and Push is supported');
+
+  navigator.serviceWorker.register('serviceWorker.js')
+  .then(function(swReg) {
+    console.log('Service Worker is registered', swReg);
+
+    swRegistration = swReg;
+  })
+  .catch(function(error) {
+    console.error('Service Worker Error', error);
+  });
+} else {
+  console.warn('Push messaging is not supported');
+}
+
+
+function updateBtn() {
+  if (Notification.permission === 'denied') {
+    pushButton.disabled = true;
+    updateSubscriptionOnServer(null);
+    return;
+  }
+
+
+  pushButton.disabled = false;
+}
+
+navigator.serviceWorker.register('serviceWorker.js')
+.then(function(swReg) {
+  console.log('Service Worker is registered', swReg);
+
+  swRegistration = swReg;
+  initialiseUI();
+})
+
+
+function subscribeUser() {
+  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+  swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerKey
+  })
+  .then(function(subscription) {
+    console.log('User is subscribed:', subscription);
+
+    updateSubscriptionOnServer(subscription);
+
+    isSubscribed = true;
+
+    updateBtn();
+  })
+  .catch(function(err) {
+    console.log('Failed to subscribe the user: ', err);
+    updateBtn();
   });
 }
+
+
+const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+swRegistration.pushManager.subscribe({
+  userVisibleOnly: true,
+  applicationServerKey: applicationServerKey
+})
+
+
+swRegistration.pushManager.subscribe({
+  userVisibleOnly: true,
+  applicationServerKey: applicationServerKey
+})
+.then(function(subscription) {
+  console.log('User is subscribed:', subscription);
+
+  updateSubscriptionOnServer(subscription);
+
+  isSubscribed = true;
+
+  updateBtn();
+
+})
+.catch(function(err) {
+  console.log('Failed to subscribe the user: ', err);
+  updateBtn();
+});
+
+
+function updateSubscriptionOnServer(subscription) {
+  // TODO: Send subscription to application server
+
+
+  if (subscription) {
+
+    
+
+
+    // aca hago mi fetch
+    // console.log("if subs", subscriptionJson.textContent)
+    // console.log("if subs", JSON.parse(subscriptionJson.textContent)["keys"]["auth"])
+
+    console.log(JSON.stringify(subscription));
+
+    const subDetails = JSON.parse(JSON.stringify(subscription));
+    console.log(subDetails);
+    
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const body = JSON.stringify({
+      "msg": "Se ha enviado la solicitud al profesor.",
+      "endpoint": subDetails.endpoint,
+      "keys": {
+        "auth": subDetails.keys.auth,
+        "p256dh": subDetails.keys.p256dh,
+      }
+    });
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body,
+      redirect: 'follow'
+    };
+    
+    fetch("https://pwag5-api.herokuapp.com/subscribe", requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+
+  } 
+}
+
+function unsubscribeUser() {
+  swRegistration.pushManager.getSubscription()
+  .then(function(subscription) {
+    if (subscription) {
+      return subscription.unsubscribe();
+    }
+  })
+  .catch(function(error) {
+    console.log('Error unsubscribing', error);
+  })
+  .then(function() {
+    updateSubscriptionOnServer(null);
+
+    console.log('User is unsubscribed.');
+    isSubscribed = false;
+
+    updateBtn();
+  });
+}
+
